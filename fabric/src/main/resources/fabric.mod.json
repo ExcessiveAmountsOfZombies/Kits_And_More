@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "${modId}",
+  "version": "${version}",
+  "name": "${modName}",
+  "description": "${description}",
+  "authors": [
+    "Thonk"
+  ],
+  "contact": {
+    "sources": "${github}",
+    "issues": "${github}/issues",
+    "homepage": "",
+    "irc": "${discord}"
+  },
+  "license": "${license}",
+  "icon": "",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.epherical.bozo.BozoFabric"
+    ]
+  },
+  "mixins": [
+    "${modId}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}
