@@ -42,6 +42,9 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
     }*/
 
+    modApi "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
+    include "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
+
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"
     modImplementation("com.epherical.epherolib:EpheroLib-fabric:${project.epherolibVersion}")

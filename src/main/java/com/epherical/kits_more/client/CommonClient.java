@@ -1,4 +1,4 @@
-package com.epherical.bozo.client;
+package com.epherical.kits_more.client;
 
 public class CommonClient {
 
