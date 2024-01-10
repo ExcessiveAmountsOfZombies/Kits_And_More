@@ -14,9 +14,13 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class UserData extends WorldBasedStorage {
+
+    private final Map<UUID, User> LOADED_USERS = new HashMap<>();
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -47,11 +51,18 @@ public class UserData extends WorldBasedStorage {
         Tag tag;
         try {
             tag = readTagFromFile(path);
-            return User.load((CompoundTag) tag, player);
+            return LOADED_USERS.put(player.getUUID(), User.load((CompoundTag) tag, player));
         } catch (IOException ignored) {
             LOGGER.debug("Creating new User for {}, {} as they do not exist currently.", player.getScoreboardName(), player.getUUID());
         }
         return new User(player.getUUID(), player.getScoreboardName(), player);
+    }
 
+    public User getUser(ServerPlayer player) {
+        if (LOADED_USERS.containsKey(player.getUUID())) {
+            return LOADED_USERS.get(player.getUUID());
+        } else {
+            return load(player);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.epherical.kits_more.commands;
 
 import com.epherical.epherolib.CommonPlatform;
+import com.epherical.kits_more.KitsMod;
 import com.epherical.kits_more.util.Kit;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -27,18 +28,18 @@ public class KitCommand {
     public static final Logger LOGGER = LogUtils.getLogger();
 
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
+    public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
         dispatcher.register(Commands.literal("kit")
                 .then(Commands.argument("type", StringArgumentType.string())
-                        .requires(stack -> KIT_USE.getPlatformResolver().resolve(stack, stack.getPlayer()))
+                        .requires(stack -> mod.KIT_USE.getPlatformResolver().resolve(stack, stack.getPlayer()))
                         .executes(KitCommand::useKit)));
         dispatcher.register(Commands.literal("kits")
                 .then(Commands.literal("delete")
                         .then(Commands.argument("name", StringArgumentType.string()))
-                        .requires(stack -> KIT_DELETION.getPlatformResolver().resolve(stack, stack.getPlayer()))
+                        .requires(stack -> mod.KIT_DELETION.getPlatformResolver().resolve(stack, stack.getPlayer()))
                         .executes(KitCommand::deleteKit))
                 .then(Commands.literal("create")
-                        .requires(stack -> KIT_CREATION.getPlatformResolver().resolve(stack, stack.getPlayer()))
+                        .requires(stack -> mod.KIT_CREATION.getPlatformResolver().resolve(stack, stack.getPlayer()))
                         .then(Commands.literal("overwrite")
                                 .then(Commands.argument("name", StringArgumentType.string())
                                         .suggests((context, builder) -> {

@@ -5,9 +5,12 @@ import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.ForgePlatform;
 import com.epherical.kits_more.commands.KitCommand;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +23,7 @@ import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 
 @Mod(Constants.MOD_ID)
-public class KitsForgeMod {
+public class KitsForgeMod extends KitsMod {
 
     private static KitsForgeMod mod;
 
@@ -46,7 +49,23 @@ public class KitsForgeMod {
 
     @SubscribeEvent
     private void registerCommands(RegisterCommandsEvent event) {
-        KitCommand.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        KitCommand.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+    }
+
+
+    @SubscribeEvent
+    private void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        onPlayerJoin((ServerPlayer) event.getEntity());
+    }
+
+    @SubscribeEvent
+    private void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
+        onPlayerQuit((ServerPlayer) event.getEntity());
+    }
+
+    @SubscribeEvent
+    private void onServerStarting(ServerStartingEvent event) {
+        onServerStarting(event.getServer());
     }
 
     @SubscribeEvent
