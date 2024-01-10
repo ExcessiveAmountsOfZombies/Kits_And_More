@@ -3,6 +3,7 @@ package com.epherical.kits_more;
 import com.epherical.kits_more.client.AModClient;
 import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.ForgePlatform;
+import com.epherical.kits_more.commands.KitCommand;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,7 +46,7 @@ public class KitsForgeMod {
 
     @SubscribeEvent
     private void registerCommands(RegisterCommandsEvent event) {
-        KitsMod.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        KitCommand.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
     }
 
     @SubscribeEvent

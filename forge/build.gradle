@@ -57,7 +57,7 @@ processResources {
 }
 
 minecraft {
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     mappings channel: 'official', version: "${project.minecraftVersion}"
     copyIdeResources = true
     //mappings channel: 'parchment', version: "${project.parchmentVersion}-${project.minecraftVersion}"

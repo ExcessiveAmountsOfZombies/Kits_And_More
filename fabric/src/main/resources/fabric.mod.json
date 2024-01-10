@@ -22,7 +22,6 @@
     ]
   },
   "mixins": [
-    "${modId}.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.13.3",
