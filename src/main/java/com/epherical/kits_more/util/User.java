@@ -61,4 +61,20 @@ public class User {
     public void setPlayer(ServerPlayer player) {
         this.player = player;
     }
+
+    public Map<Kit, Instant> getKitCoolDowns() {
+        return kitCoolDowns;
+    }
+
+    public void setKitCoolDowns(Map<Kit, Instant> kitCoolDowns) {
+        this.kitCoolDowns = kitCoolDowns;
+    }
+
+    public boolean hasReceivedMainKit() {
+        return receivedMainKit;
+    }
+
+    public void setReceivedMainKit(boolean receivedMainKit) {
+        this.receivedMainKit = receivedMainKit;
+    }
 }

@@ -1,6 +1,9 @@
 package com.epherical.kits_more.util;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 import java.util.Objects;
 
@@ -28,6 +31,11 @@ public class Kit {
         return name;
     }
 
+    public void giveKitToPlayer(ServerPlayer player) {
+        Inventory inventory = new Inventory(player);
+        inventory.load((ListTag) items.get("Inventory"));
+        inventory.dropAll();
+    }
 
     @Override
     public boolean equals(Object o) {
