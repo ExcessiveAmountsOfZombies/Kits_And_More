@@ -31,6 +31,7 @@ public class KitsForgeMod extends KitsMod {
 
 
     public KitsForgeMod() {
+        super();
         mod = this;
         CommonPlatform.create(new ForgePlatform());
         try {
@@ -55,28 +56,28 @@ public class KitsForgeMod extends KitsMod {
     }
 
     @SubscribeEvent
-    private void registerCommands(RegisterCommandsEvent event) {
+    public void registerCommands(RegisterCommandsEvent event) {
         KitCommand.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
     }
 
 
     @SubscribeEvent
-    private void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+    public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         onPlayerJoin((ServerPlayer) event.getEntity());
     }
 
     @SubscribeEvent
-    private void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
+    public void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
         onPlayerQuit((ServerPlayer) event.getEntity());
     }
 
     @SubscribeEvent
-    private void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event) {
         onServerStarting(event.getServer());
     }
 
     @SubscribeEvent
-    private void registerPermission(PermissionGatherEvent.Nodes gatherEvent) {
+    public void registerPermission(PermissionGatherEvent.Nodes gatherEvent) {
         for (Permission permission : KitsMod.PERMISSIONS) {
             PermissionNode<Boolean> node = new PermissionNode<>(permission.getNode(), PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
                 return permission.getDefaultResolver().resolve(null, player);

@@ -30,7 +30,7 @@ public class KitConfig extends CommonConfig {
     public CommentedConfigurationNode generateConfig(CommentedConfigurationNode node) {
         try {
             node.node("version").set(configVersion).comment("Config Version do not edit");
-            node.node("giveKitsInExistingWorlds").comment("If you have an existing world/server, and you would like players to receive a 'main' kit when they log in," +
+            node.node("giveKitsInExistingWorlds").set(giveKitsInExistingWorlds).comment("If you have an existing world/server, and you would like players to receive a 'main' kit when they log in," +
                     "you can set this to true and they will receive the items, dropped at their feet if they have no room in their inventory.");
 
         } catch (SerializationException e) {

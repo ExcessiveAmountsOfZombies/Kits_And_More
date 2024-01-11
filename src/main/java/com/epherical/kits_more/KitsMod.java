@@ -37,6 +37,7 @@ public class KitsMod {
 
     public KitsMod() {
         config = new KitConfig(HoconConfigurationLoader.builder(), "kits_and_more.conf");
+        config.loadConfig("kits_and_more");
     }
 
 

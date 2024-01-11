@@ -109,7 +109,7 @@ public class KitCommand {
 
         Kit kit = new Kit(kitName, cooldownMinutes, tag);
         instance.kitData.saveKitsToFile(kit);
-        player.sendSystemMessage(Constants.sendSuccessMessage("Kit %s was successfully created with a cooldown of %s.", kitName, cooldownMinutes));
+        player.sendSystemMessage(Constants.sendSuccessMessage("Kit %s was successfully created with a cooldown of %s minutes.", kitName, cooldownMinutes));
         return 1;
     }
 
