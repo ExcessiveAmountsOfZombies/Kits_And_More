@@ -1,6 +1,5 @@
 package com.epherical.kits_more;
 
-import com.epherical.kits_more.client.AModClient;
 import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.ForgePlatform;
 import com.epherical.kits_more.commands.KitCommand;
@@ -19,7 +18,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
-import net.minecraftforge.server.permission.nodes.PermissionDynamicContextKey;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 
@@ -48,8 +46,8 @@ public class KitsForgeMod extends KitsMod {
     }
 
     private void clientInit(FMLClientSetupEvent event) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AModClient::initClient);
-        MinecraftForge.EVENT_BUS.register(new AModClient());
+        /*DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AModClient::initClient);
+        MinecraftForge.EVENT_BUS.register(new AModClient());*/
     }
 
     private void commonInit(FMLCommonSetupEvent event) {

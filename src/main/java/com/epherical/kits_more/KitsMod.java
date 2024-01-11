@@ -1,5 +1,6 @@
 package com.epherical.kits_more;
 
+import com.epherical.epherolib.libs.org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import com.epherical.kits_more.config.KitConfig;
 import com.epherical.kits_more.data.KitData;
 import com.epherical.kits_more.data.UserData;
@@ -32,6 +33,11 @@ public class KitsMod {
 
     public UserData userData;
     public KitData kitData = new KitData();
+    public KitConfig config;
+
+    public KitsMod() {
+        config = new KitConfig(HoconConfigurationLoader.builder(), "kits_and_more.conf");
+    }
 
 
     private boolean getDefaultPerms(CommandSourceStack stack, ServerPlayer player, int level) {
@@ -57,7 +63,7 @@ public class KitsMod {
     public void onPlayerJoin(ServerPlayer player) {
         int value = player.getStats().getValue((Stats.CUSTOM), Stats.PLAYER_KILLS);
         User user = userData.getUser(player);
-        if (value > 0 && KitConfig.giveKitsInExistingWorlds && !user.hasReceivedMainKit()) {
+        if (value > 0 && config.giveKitsInExistingWorlds && !user.hasReceivedMainKit()) {
             provideKit(player, user, false);
         } else if (value <= 0 && !user.hasReceivedMainKit()) {
             // This happens on first login
