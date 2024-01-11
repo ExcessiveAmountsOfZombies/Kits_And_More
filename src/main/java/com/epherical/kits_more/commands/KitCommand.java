@@ -9,6 +9,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.logging.LogUtils;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -30,11 +31,13 @@ public class KitCommand {
 
     public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
         instance = mod;
-        dispatcher.register(Commands.literal("kit")
+        LiteralCommandNode<CommandSourceStack> kitCommand = dispatcher.register(Commands.literal("kit")
                 .then(Commands.argument("name", StringArgumentType.string())
                         .requires(stack -> mod.KIT_USE.getPlatformResolver().resolve(stack, stack.getPlayer()))
                         .executes(KitCommand::useKit)));
-        dispatcher.register(Commands.literal("kits")
+
+        dispatcher.register(Commands.literal("kam:kit").redirect(kitCommand));
+        LiteralCommandNode<CommandSourceStack> kitsCommand = dispatcher.register(Commands.literal("kits")
                 .then(Commands.literal("delete")
                         .then(Commands.argument("name", StringArgumentType.string()))
                         .requires(stack -> mod.KIT_DELETION.getPlatformResolver().resolve(stack, stack.getPlayer()))
@@ -77,6 +80,7 @@ public class KitCommand {
                                         })
                                         .executes(KitCommand::createKitWithCoolDown)
                                 ))));
+        dispatcher.register(Commands.literal("kam:kits").redirect(kitsCommand));
 
     }
 

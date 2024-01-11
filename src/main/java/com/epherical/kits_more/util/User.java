@@ -1,10 +1,12 @@
 package com.epherical.kits_more.util;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ public class User {
     private final String name;
     private @Nullable ServerPlayer player;
 
-    private Map<Kit, Instant> kitCoolDowns = new HashMap<>();
+    private Map<String, Instant> kitCoolDowns = new HashMap<>();
 
     private boolean receivedMainKit = false;
 
@@ -37,12 +39,28 @@ public class User {
         tag.putUUID("uuid", uuid);
         tag.putString("name", name);
         tag.putBoolean("receivedMainKit", receivedMainKit);
+        ListTag tags = new ListTag();
+        for (Map.Entry<String, Instant> entry : kitCoolDowns.entrySet()) {
+            CompoundTag comp = new CompoundTag();
+            comp.putString("kitName", entry.getKey());
+            comp.putLong("cooldown", entry.getValue().getEpochSecond());
+        }
+        tag.put("cooldowns", tags);
         return tag;
     }
 
     public static User load(CompoundTag tag, ServerPlayer player) {
         User user = new User(tag.getUUID("uuid"), tag.getString("name"), player);
         user.receivedMainKit = tag.getBoolean("receivedMainKit");
+        Map<String, Instant> coolDowns = new HashMap<>();
+        ListTag listTag = (ListTag) tag.get("cooldowns");
+        if (listTag != null) {
+            for (Tag t : listTag) {
+                CompoundTag comp = (CompoundTag) t;
+                coolDowns.put(comp.getString("kitName"), Instant.ofEpochSecond(comp.getLong("cooldown")));
+            }
+        }
+        user.kitCoolDowns = coolDowns;
         return user;
     }
 
@@ -51,7 +69,11 @@ public class User {
     }
 
     public void addCoolDownForKit(Kit kit) {
-        kitCoolDowns.put(kit, Instant.now().plusSeconds(60L * kit.getCooldownMinutes()));
+        if (kit.getCooldownMinutes() == -1) {
+            kitCoolDowns.put(kit.getName(), Instant.MAX);
+        } else {
+            kitCoolDowns.put(kit.getName(), Instant.now().plusSeconds(60L * kit.getCooldownMinutes()));
+        }
     }
 
     public UUID getUuid() {
@@ -70,11 +92,11 @@ public class User {
         this.player = player;
     }
 
-    public Map<Kit, Instant> getKitCoolDowns() {
+    public Map<String, Instant> getKitCoolDowns() {
         return kitCoolDowns;
     }
 
-    public void setKitCoolDowns(Map<Kit, Instant> kitCoolDowns) {
+    public void setKitCoolDowns(Map<String, Instant> kitCoolDowns) {
         this.kitCoolDowns = kitCoolDowns;
     }
 

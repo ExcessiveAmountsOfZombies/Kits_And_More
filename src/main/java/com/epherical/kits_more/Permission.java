@@ -1,12 +1,9 @@
 package com.epherical.kits_more;
 
-import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
 
 public class Permission {
     private final ResourceLocation node;
