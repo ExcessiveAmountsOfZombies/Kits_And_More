@@ -1,9 +1,13 @@
 package com.epherical.kits_more.util;
 
+import com.epherical.kits_more.mixin.InventoryAccessor;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
 
@@ -37,7 +41,17 @@ public class Kit {
         } else {
             Inventory inventory = new Inventory(player);
             inventory.load((ListTag) items.get("Inventory"));
-            inventory.dropAll();
+            InventoryAccessor accessor = (InventoryAccessor) inventory;
+            for (NonNullList<ItemStack> compartment : accessor.getCompartments()) {
+                for (ItemStack itemStack : compartment) {
+                    if (!itemStack.isEmpty()) {
+                        ItemEntity drop = player.drop(itemStack, false, false);
+                        if (drop != null) {
+                            drop.setPickUpDelay(0);
+                        }
+                    }
+                }
+            }
         }
 
     }

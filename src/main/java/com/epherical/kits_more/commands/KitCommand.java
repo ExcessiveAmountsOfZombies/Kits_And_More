@@ -2,6 +2,7 @@ package com.epherical.kits_more.commands;
 
 import com.epherical.kits_more.KitsMod;
 import com.epherical.kits_more.util.Kit;
+import com.epherical.kits_more.util.User;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -17,6 +18,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 
+import java.time.Instant;
+
 public class KitCommand {
 
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -27,7 +30,7 @@ public class KitCommand {
     public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
         instance = mod;
         dispatcher.register(Commands.literal("kit")
-                .then(Commands.argument("type", StringArgumentType.string())
+                .then(Commands.argument("name", StringArgumentType.string())
                         .requires(stack -> mod.KIT_USE.getPlatformResolver().resolve(stack, stack.getPlayer()))
                         .executes(KitCommand::useKit)));
         dispatcher.register(Commands.literal("kits")
@@ -110,7 +113,22 @@ public class KitCommand {
         return 1;
     }
 
-    private static int useKit(CommandContext<CommandSourceStack> context) {
+    private static int useKit(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        User user = instance.userData.getUser(player);
+        String name = StringArgumentType.getString(context, "name");
+        Kit kit = instance.kitData.KITS.get(name);
+        Instant coolDownForKit = user.getCoolDownForKit(kit);
+        if (coolDownForKit == null || coolDownForKit.isBefore(Instant.now())) {
+            // We can provide the kit to the player
+            kit.giveKitToPlayer(player, false);
+            user.addCoolDownForKit(kit);
+            // todo; send message about receiving kit.
+        } else {
+            // todo; send message about kit being on cooldown to the player.
+        }
+
+
 
         return 1;
     }

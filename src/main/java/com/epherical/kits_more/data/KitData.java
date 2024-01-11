@@ -8,14 +8,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.commands.CommandSource;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import org.slf4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,8 +26,6 @@ public class KitData {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public final Map<String, Kit> KITS = new HashMap<>();
-
-
 
 
     public void loadKitsFromFile() {
@@ -70,7 +64,7 @@ public class KitData {
         for (Kit value : KITS.values()) {
             allKits.put(value.getName(), value.getItems());
         }
-        try( FileWriter writer = new FileWriter(getPathForConfig().toFile())) {
+        try (FileWriter writer = new FileWriter(getPathForConfig().toFile())) {
             JsonElement jsonElement = NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, allKits);
             GSON.toJson(jsonElement, writer);
         } catch (IOException e) {

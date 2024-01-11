@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.epherical.kits_more.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "Kits_And_More-refmap.json",
+  "mixins": [
+    "InventoryAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

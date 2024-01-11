@@ -46,6 +46,14 @@ public class User {
         return user;
     }
 
+    public Instant getCoolDownForKit(Kit kit) {
+        return kitCoolDowns.get(kit);
+    }
+
+    public void addCoolDownForKit(Kit kit) {
+        kitCoolDowns.put(kit, Instant.now().plusSeconds(60L * kit.getCooldownMinutes()));
+    }
+
     public UUID getUuid() {
         return uuid;
     }
