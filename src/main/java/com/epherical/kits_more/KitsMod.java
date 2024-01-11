@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class KitsMod {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    protected static final Logger LOGGER = LogUtils.getLogger();
 
 
     public static final Map<String, Kit> KITS = new HashMap<>();
@@ -59,19 +59,19 @@ public class KitsMod {
         int value = player.getStats().getValue((Stats.CUSTOM), Stats.PLAYER_KILLS);
         User user = data.getUser(player);
         if (value > 0 && KitConfig.giveKitsInExistingWorlds && !user.hasReceivedMainKit()) {
-            provideKit(player, user);
+            provideKit(player, user, false);
         } else if (value <= 0 && !user.hasReceivedMainKit()) {
-            provideKit(player, user);
-
+            // This happens on first login
+            provideKit(player, user, true);
         }
 
         data.savePlayer(user);
     }
 
-    private static void provideKit(ServerPlayer player, User user) {
+    public static void provideKit(ServerPlayer player, User user, boolean firstLogin) {
         Kit main = KITS.get("main");
         if (main != null) {
-            main.giveKitToPlayer(player);
+            main.giveKitToPlayer(player, firstLogin);
             user.setReceivedMainKit(true);
         } else {
             LOGGER.debug("Could not provide a kit to player {} {} as it does not exist", player.getUUID(), player.getScoreboardName());

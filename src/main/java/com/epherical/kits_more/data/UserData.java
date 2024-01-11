@@ -51,7 +51,9 @@ public class UserData extends WorldBasedStorage {
         Tag tag;
         try {
             tag = readTagFromFile(path);
-            return LOADED_USERS.put(player.getUUID(), User.load((CompoundTag) tag, player));
+            User load = User.load((CompoundTag) tag, player);
+            LOADED_USERS.put(player.getUUID(), load);
+            return load;
         } catch (IOException ignored) {
             LOGGER.debug("Creating new User for {}, {} as they do not exist currently.", player.getScoreboardName(), player.getUUID());
         }

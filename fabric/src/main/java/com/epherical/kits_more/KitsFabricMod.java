@@ -9,6 +9,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 public class KitsFabricMod extends KitsMod implements ModInitializer {
 
 
@@ -16,6 +19,11 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
     @Override
     public void onInitialize() {
         CommonPlatform.create(new FabricPlatform());
+        try {
+            Files.createDirectory(CommonPlatform.platform.getRootConfigPath("kits_and_more"));
+        } catch (IOException e) {
+            LOGGER.warn("could not create config folder for kits_and_more mod.", e);
+        }
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             KitCommand.register(this, dispatcher, registryAccess, environment);

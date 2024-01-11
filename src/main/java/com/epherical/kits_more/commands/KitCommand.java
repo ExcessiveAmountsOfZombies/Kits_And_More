@@ -3,22 +3,29 @@ package com.epherical.kits_more.commands;
 import com.epherical.epherolib.CommonPlatform;
 import com.epherical.kits_more.KitsMod;
 import com.epherical.kits_more.util.Kit;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 import static com.epherical.kits_more.KitsMod.*;
@@ -26,6 +33,8 @@ import static com.epherical.kits_more.KitsMod.*;
 public class KitCommand {
 
     public static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 
     public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
@@ -47,7 +56,7 @@ public class KitCommand {
                                             return builder.buildFuture();
                                         })
                                         .executes(KitCommand::createKitWithOverwrite))
-                                .then(Commands.argument("cooldownMins", IntegerArgumentType.integer(0))
+                                .then(Commands.argument("cooldownMins", IntegerArgumentType.integer(-1))
                                         .suggests((context, builder) -> {
                                             // oit no work
                                             builder.suggest(1);
@@ -67,7 +76,7 @@ public class KitCommand {
                                     return builder.buildFuture();
                                 })
                                 .executes(context -> createKit(context, 60, false))
-                                .then(Commands.argument("cooldownMins", IntegerArgumentType.integer(0))
+                                .then(Commands.argument("cooldownMins", IntegerArgumentType.integer(-1))
                                         .suggests((context, builder) -> {
                                             builder.suggest(1);
                                             builder.suggest(60);
@@ -109,11 +118,13 @@ public class KitCommand {
         Kit kit = new Kit(kitName, cooldownMinutes, tag);
         KITS.put(kitName, kit);
         writeKitsToFile();
+        // todo; write thing that will tell the user the kit was created
 
         return 1;
     }
 
     private static int useKit(CommandContext<CommandSourceStack> context) {
+
         return 1;
     }
 
@@ -133,8 +144,9 @@ public class KitCommand {
         for (Kit value : KITS.values()) {
             allKits.put(value.getName(), value.getItems());
         }
-        try {
-            NbtIo.write(allKits, CommonPlatform.platform.getRootConfigPath("kits_and_more").toFile());
+        try( FileWriter writer = new FileWriter(CommonPlatform.platform.getRootConfigPath("kits_and_more/kits.json").toFile())) {
+            JsonElement jsonElement = NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, allKits);
+            GSON.toJson(jsonElement, writer);
         } catch (IOException e) {
             LOGGER.warn("Could not write to kit file", e);
         }

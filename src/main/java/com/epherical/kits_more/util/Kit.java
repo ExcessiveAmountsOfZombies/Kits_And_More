@@ -31,10 +31,15 @@ public class Kit {
         return name;
     }
 
-    public void giveKitToPlayer(ServerPlayer player) {
-        Inventory inventory = new Inventory(player);
-        inventory.load((ListTag) items.get("Inventory"));
-        inventory.dropAll();
+    public void giveKitToPlayer(ServerPlayer player, boolean firstLogin) {
+        if (firstLogin) {
+            player.getInventory().load((ListTag) items.get("Inventory"));
+        } else {
+            Inventory inventory = new Inventory(player);
+            inventory.load((ListTag) items.get("Inventory"));
+            inventory.dropAll();
+        }
+
     }
 
     @Override

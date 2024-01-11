@@ -19,8 +19,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
+import net.minecraftforge.server.permission.nodes.PermissionDynamicContextKey;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 @Mod(Constants.MOD_ID)
 public class KitsForgeMod extends KitsMod {
@@ -31,6 +35,11 @@ public class KitsForgeMod extends KitsMod {
     public KitsForgeMod() {
         mod = this;
         CommonPlatform.create(new ForgePlatform());
+        try {
+            Files.createDirectory(CommonPlatform.platform.getRootConfigPath("kits_and_more"));
+        } catch (IOException e) {
+            LOGGER.warn("could not create config folder for kits_and_more mod.", e);
+        }
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonInit);
