@@ -1,43 +1,31 @@
 package com.epherical.kits_more.commands;
 
-import com.epherical.epherolib.CommonPlatform;
 import com.epherical.kits_more.KitsMod;
 import com.epherical.kits_more.util.Kit;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
-
-import java.io.FileWriter;
-import java.io.IOException;
-
-import static com.epherical.kits_more.KitsMod.*;
 
 public class KitCommand {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static KitsMod instance;
 
 
     public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
+        instance = mod;
         dispatcher.register(Commands.literal("kit")
                 .then(Commands.argument("type", StringArgumentType.string())
                         .requires(stack -> mod.KIT_USE.getPlatformResolver().resolve(stack, stack.getPlayer()))
@@ -109,16 +97,15 @@ public class KitCommand {
         tag.putInt("cooldownMinutes", cooldownMinutes);
         tag.put("Inventory", player.getInventory().save(new ListTag()));
 
-        if (!overwrite && KITS.containsKey(kitName)) {
+        if (!overwrite && instance.kitData.KITS.containsKey(kitName)) {
             LOGGER.debug("Attempted to overwrite a kit without setting the overwrite flag.");
             context.getSource().sendFailure(Component.translatable("Kit could not be overwritten, the overwrite flag was not set."));
             return 0;
         }
 
         Kit kit = new Kit(kitName, cooldownMinutes, tag);
-        KITS.put(kitName, kit);
-        writeKitsToFile();
-        // todo; write thing that will tell the user the kit was created
+        instance.kitData.saveKitsToFile(kit);
+        // todo; send message
 
         return 1;
     }
@@ -130,26 +117,10 @@ public class KitCommand {
 
     private static int deleteKit(CommandContext<CommandSourceStack> context) {
         String name = StringArgumentType.getString(context, "name");
-        KITS.remove(name);
-
-        writeKitsToFile();
-
+        instance.kitData.deleteKitAndSave(name);
+        // todo; send message
         return 1;
     }
 
-
-    private static void writeKitsToFile() {
-        CompoundTag allKits = new CompoundTag();
-
-        for (Kit value : KITS.values()) {
-            allKits.put(value.getName(), value.getItems());
-        }
-        try( FileWriter writer = new FileWriter(CommonPlatform.platform.getRootConfigPath("kits_and_more/kits.json").toFile())) {
-            JsonElement jsonElement = NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, allKits);
-            GSON.toJson(jsonElement, writer);
-        } catch (IOException e) {
-            LOGGER.warn("Could not write to kit file", e);
-        }
-    }
 
 }

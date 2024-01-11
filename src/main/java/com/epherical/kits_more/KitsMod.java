@@ -1,6 +1,7 @@
 package com.epherical.kits_more;
 
 import com.epherical.kits_more.config.KitConfig;
+import com.epherical.kits_more.data.KitData;
 import com.epherical.kits_more.data.UserData;
 import com.epherical.kits_more.util.Kit;
 import com.epherical.kits_more.util.User;
@@ -13,16 +14,12 @@ import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class KitsMod {
 
     protected static final Logger LOGGER = LogUtils.getLogger();
 
-
-    public static final Map<String, Kit> KITS = new HashMap<>();
 
     public static final List<Permission> PERMISSIONS = new ArrayList<>();
 
@@ -33,7 +30,8 @@ public class KitsMod {
         return getDefaultPerms(stack, player, 0);
     }));
 
-    public UserData data;
+    public UserData userData;
+    public KitData kitData = new KitData();
 
 
     private boolean getDefaultPerms(CommandSourceStack stack, ServerPlayer player, int level) {
@@ -51,13 +49,14 @@ public class KitsMod {
 
 
     public void onServerStarting(MinecraftServer server) {
-        this.data = new UserData(LevelResource.ROOT, server, "kits_and_more/players");
+        this.userData = new UserData(LevelResource.ROOT, server, "kits_and_more/players");
+        this.kitData.loadKitsFromFile();
     }
 
 
     public void onPlayerJoin(ServerPlayer player) {
         int value = player.getStats().getValue((Stats.CUSTOM), Stats.PLAYER_KILLS);
-        User user = data.getUser(player);
+        User user = userData.getUser(player);
         if (value > 0 && KitConfig.giveKitsInExistingWorlds && !user.hasReceivedMainKit()) {
             provideKit(player, user, false);
         } else if (value <= 0 && !user.hasReceivedMainKit()) {
@@ -65,11 +64,11 @@ public class KitsMod {
             provideKit(player, user, true);
         }
 
-        data.savePlayer(user);
+        userData.savePlayer(user);
     }
 
-    public static void provideKit(ServerPlayer player, User user, boolean firstLogin) {
-        Kit main = KITS.get("main");
+    public void provideKit(ServerPlayer player, User user, boolean firstLogin) {
+        Kit main = kitData.KITS.get("main");
         if (main != null) {
             main.giveKitToPlayer(player, firstLogin);
             user.setReceivedMainKit(true);
@@ -79,7 +78,7 @@ public class KitsMod {
     }
 
     public void onPlayerQuit(ServerPlayer player) {
-        data.savePlayer(data.getUser(player));
+        userData.savePlayer(userData.getUser(player));
     }
 
 
