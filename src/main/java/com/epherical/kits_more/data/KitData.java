@@ -43,9 +43,10 @@ public class KitData {
 
     }
 
-    public void deleteKitAndSave(String kitName) {
-        KITS.remove(kitName);
+    public Kit deleteKitAndSave(String kitName) {
+        Kit remove = KITS.remove(kitName);
         writeKitsToFile();
+        return remove;
     }
 
     public void saveKitsToFile(Kit kit) {

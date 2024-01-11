@@ -1,5 +1,6 @@
 package com.epherical.kits_more.commands;
 
+import com.epherical.kits_more.Constants;
 import com.epherical.kits_more.KitsMod;
 import com.epherical.kits_more.util.Kit;
 import com.epherical.kits_more.util.User;
@@ -14,11 +15,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class KitCommand {
 
@@ -102,14 +103,13 @@ public class KitCommand {
 
         if (!overwrite && instance.kitData.KITS.containsKey(kitName)) {
             LOGGER.debug("Attempted to overwrite a kit without setting the overwrite flag.");
-            context.getSource().sendFailure(Component.translatable("Kit could not be overwritten, the overwrite flag was not set."));
+            player.sendSystemMessage(Constants.sendFailureMessage("Kit %s could not be overwritten, the overwrite flag was not set!", kitName));
             return 0;
         }
 
         Kit kit = new Kit(kitName, cooldownMinutes, tag);
         instance.kitData.saveKitsToFile(kit);
-        // todo; send message
-
+        player.sendSystemMessage(Constants.sendSuccessMessage("Kit %s was successfully created with a cooldown of %s.", kitName, cooldownMinutes));
         return 1;
     }
 
@@ -123,20 +123,26 @@ public class KitCommand {
             // We can provide the kit to the player
             kit.giveKitToPlayer(player, false);
             user.addCoolDownForKit(kit);
-            // todo; send message about receiving kit.
+            player.sendSystemMessage(Constants.sendSuccessMessage("Here is your kit!"));
         } else {
-            // todo; send message about kit being on cooldown to the player.
+            long until = coolDownForKit.until(Instant.now(), ChronoUnit.MINUTES);
+            player.sendSystemMessage(Constants.sendFailureMessage("Your kit is currently on cooldown, you cannot claim it. Claimable in %s Minutes", until));
         }
-
 
 
         return 1;
     }
 
-    private static int deleteKit(CommandContext<CommandSourceStack> context) {
+    private static int deleteKit(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         String name = StringArgumentType.getString(context, "name");
-        instance.kitData.deleteKitAndSave(name);
-        // todo; send message
+        Kit kit = instance.kitData.deleteKitAndSave(name);
+        if (kit != null) {
+            player.sendSystemMessage(Constants.sendSuccessMessage("The kit %s was deleted.", kit.getName()));
+        } else {
+            player.sendSystemMessage(Constants.sendFailureMessage("The kit %s does not exist!", name));
+        }
+
         return 1;
     }
 
