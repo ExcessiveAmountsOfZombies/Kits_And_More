@@ -2,6 +2,7 @@ package com.epherical.kits_more;
 
 import com.epherical.epherolib.libs.org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import com.epherical.kits_more.config.KitConfig;
+import com.epherical.kits_more.config.Translations;
 import com.epherical.kits_more.data.KitData;
 import com.epherical.kits_more.data.UserData;
 import com.epherical.kits_more.util.Kit;
@@ -31,13 +32,25 @@ public class KitsMod {
         return getDefaultPerms(stack, player, 0);
     }));
 
+    public final Permission CHECK = registerPermission(new Permission(Constants.id("command.balance.check"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission CHECK_OTHER = registerPermission(new Permission(Constants.id("command.balance.check.other"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission ADD = registerPermission(new Permission(Constants.id("command.balance.add"), (stack, player) -> getDefaultPerms(stack, player, 2)));
+    public final Permission REMOVE = registerPermission(new Permission(Constants.id("command.balance.remove"), (stack, player) -> getDefaultPerms(stack, player, 2)));
+    public final Permission SET = registerPermission(new Permission(Constants.id("command.balance.set"), (stack, player) -> getDefaultPerms(stack, player, 2)));
+    public final Permission PAY = registerPermission(new Permission(Constants.id("command.balance.pay"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+
     public UserData userData;
     public KitData kitData = new KitData();
     public KitConfig config;
 
+    public Translations translations;
+
     public KitsMod() {
         config = new KitConfig(HoconConfigurationLoader.builder(), "kits_and_more.conf");
         config.loadConfig("kits_and_more");
+
+        translations = new Translations("translations");
+        translations.loadTranslations("kits_and_more", "en_us");
     }
 
 

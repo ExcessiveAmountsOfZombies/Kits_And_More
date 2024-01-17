@@ -48,6 +48,8 @@ dependencies {
 
     modApi "me.lucko:fabric-permissions-api:0.3-SNAPSHOT"
     include "me.lucko:fabric-permissions-api:0.3-SNAPSHOT"
+    include "com.epherical.octo-economy-api:OctoEconomyApi-fabric:${project.octoEconApiVersion}"
+    modApi "com.epherical.octo-economy-api:OctoEconomyApi-fabric:${project.octoEconApiVersion}"
 
     shade(rootProject)
     compileOnly(rootProject)

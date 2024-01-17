@@ -44,6 +44,7 @@ dependencies {
     compileOnly group:'org.spongepowered', name:'mixin', version: mixinVersion
     compileOnlyApi("org.jetbrains:annotations:${project.JBAnnotationsVersion}")
     compileOnlyApi("com.epherical.epherolib:EpheroLib:${project.epherolibVersion}")
+    implementation("com.epherical.octo-economy-api:OctoEconomyApi:${project.octoEconApiVersion}")
 }
 
 sourceSets {
