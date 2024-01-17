@@ -19,4 +19,8 @@ public class Translations extends LanguageConfig {
     public MutableComponent createTranslation(ServerPlayer player, String key, String fallback, Object... values) {
         return Component.translatable(Translations.getLanguage(player).getOrDefault(key, fallback), values);
     }
+
+    public MutableComponent createTranslation(ServerPlayer player, String key, Object... values) {
+        return Component.translatable(Translations.getLanguage(player).getOrDefault(key), values);
+    }
 }

@@ -1,0 +1,10 @@
+{
+  "econ.player.has": "%s has %s.",
+  "econ.player.added": "Added %s to %s account.",
+  "econ.player.removed": "Removed %s to %s account.",
+  "econ.player.set": "Set money to %s in %s account.",
+  "econ.player.error.send_money_to_self": "You can't send money to yourself!",
+  "econ.player.success.send_money": "You have sent %s to %s!",
+  "econ.player.success.receive_money": "You have received %s from %s!"
+
+}

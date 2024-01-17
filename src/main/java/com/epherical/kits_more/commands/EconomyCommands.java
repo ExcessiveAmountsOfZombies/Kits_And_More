@@ -90,7 +90,7 @@ public class EconomyCommands {
             Currency currency = provider.getDefaultCurrency();
             user.depositMoney(currency, amount, "command");
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
-            Component component = Component.translatable("Added %s to %s account.", currency.format(amount, 2), playerName)
+            Component component = instance.translations.createTranslation(player, "econ.player.added", currency.format(amount, 2), playerName)
                     .setStyle(Constants.APPROVAL_STYLE);
             context.getSource().sendSuccess(() -> component, false);
         }
@@ -106,7 +106,7 @@ public class EconomyCommands {
             Currency currency = provider.getDefaultCurrency();
             user.withdrawMoney(currency, amount, "command");
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
-            Component component = Component.translatable("Removed %s from %s account.", currency.format(amount, 2), playerName)
+            Component component = instance.translations.createTranslation(player, "econ.player.removed", currency.format(amount, 2), playerName)
                     .setStyle(Constants.APPROVAL_STYLE);
             context.getSource().sendSuccess(() -> component, false);
         }
@@ -122,7 +122,7 @@ public class EconomyCommands {
             Currency currency = provider.getDefaultCurrency();
             user.setBalance(currency, amount);
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
-            Component component = Component.translatable("Set money to %s in %s account.", currency.format(amount, 2), playerName)
+            Component component = instance.translations.createTranslation(player, "econ.player.set", currency.format(amount, 2), playerName)
                     .setStyle(Constants.APPROVAL_STYLE);
             context.getSource().sendSuccess(() -> component, false);
         }
@@ -138,7 +138,7 @@ public class EconomyCommands {
         UniqueUser targetUser = provider.getOrCreatePlayerAccount(target.getUUID());
         if (sourceUser != null && targetUser != null) {
             if (source.equals(target)) {
-                Component message = Component.literal("You can't send money to yourself!").setStyle(Constants.ERROR_STYLE);
+                Component message = instance.translations.createTranslation(source, "econ.player.error.send_money_to_self").setStyle(Constants.ERROR_STYLE);
                 context.getSource().sendFailure(message);
                 return 0;
             }
@@ -148,9 +148,9 @@ public class EconomyCommands {
                 sourceUser.sendTo(targetUser, currency, amount);
                 Component targetName = Component.literal(target.getScoreboardName()).withStyle(Constants.VARIABLE_STYLE);
                 Component sourceName = Component.literal(source.getScoreboardName()).withStyle(Constants.VARIABLE_STYLE);
-                Component sourceMessage = Component.translatable("You have sent %s to %s!", currency.format(amount, 2), targetName)
+                Component sourceMessage = instance.translations.createTranslation(source, "econ.player.success.send_money", currency.format(amount, 2), targetName)
                         .setStyle(Constants.APPROVAL_STYLE);
-                Component targetMessage = Component.translatable("You have received %s from %s!", currency.format(amount, 2), sourceName)
+                Component targetMessage = instance.translations.createTranslation(target, "econ.player.success.receive_money", currency.format(amount, 2), sourceName)
                         .setStyle(Constants.APPROVAL_STYLE);
                 context.getSource().sendSuccess(() -> sourceMessage, true);
                 target.sendSystemMessage(targetMessage);
