@@ -1,5 +1,8 @@
 package com.epherical.kits_more.util;
 
+import com.epherical.kits_more.util.econ.EconomyUser;
+import com.epherical.octoecon.api.Currency;
+import com.epherical.octoecon.api.user.UniqueUser;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -11,15 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class User {
+public class User extends EconomyUser implements UniqueUser {
 
     private final UUID uuid;
-    private final String name;
     private @Nullable ServerPlayer player;
 
     private Map<String, Instant> kitCoolDowns = new HashMap<>();
 
-    private boolean receivedMainKit = false;
+    private boolean receivedFirstLoginBenefits = false;
 
 
     public User(UUID uuid, String name) {
@@ -27,17 +29,16 @@ public class User {
     }
 
     public User(UUID uuid, String name, @Nullable ServerPlayer player) {
+        super(name);
         this.uuid = uuid;
-        this.name = name;
         this.player = player;
     }
 
 
     public CompoundTag save() {
-        CompoundTag tag = new CompoundTag();
+        CompoundTag tag = super.save();
         tag.putUUID("uuid", uuid);
-        tag.putString("name", name);
-        tag.putBoolean("receivedMainKit", receivedMainKit);
+        tag.putBoolean("receivedFirstLoginBenefits", receivedFirstLoginBenefits);
         ListTag tags = new ListTag();
         for (Map.Entry<String, Instant> entry : kitCoolDowns.entrySet()) {
             CompoundTag comp = new CompoundTag();
@@ -50,7 +51,7 @@ public class User {
 
     public static User load(CompoundTag tag, ServerPlayer player) {
         User user = new User(tag.getUUID("uuid"), tag.getString("name"), player);
-        user.receivedMainKit = tag.getBoolean("receivedMainKit");
+        user.receivedFirstLoginBenefits = tag.getBoolean("receivedFirstLoginBenefits");
         Map<String, Instant> coolDowns = new HashMap<>();
         ListTag listTag = (ListTag) tag.get("cooldowns");
         if (listTag != null) {
@@ -64,7 +65,7 @@ public class User {
     }
 
     public Instant getCoolDownForKit(Kit kit) {
-        return kitCoolDowns.get(kit);
+        return kitCoolDowns.get(kit.getName());
     }
 
     public void addCoolDownForKit(Kit kit) {
@@ -75,12 +76,8 @@ public class User {
         }
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
     public String getName() {
-        return name;
+        return getIdentity();
     }
 
     public @Nullable ServerPlayer getPlayer() {
@@ -99,11 +96,15 @@ public class User {
         this.kitCoolDowns = kitCoolDowns;
     }
 
-    public boolean hasReceivedMainKit() {
-        return receivedMainKit;
+    public boolean hasReceivedFirstLoginBenefits() {
+        return receivedFirstLoginBenefits;
     }
 
-    public void setReceivedMainKit(boolean receivedMainKit) {
-        this.receivedMainKit = receivedMainKit;
+    public void setReceivedFirstLoginBenefits(boolean receivedFirstLoginBenefits) {
+        this.receivedFirstLoginBenefits = receivedFirstLoginBenefits;
+    }
+    @Override
+    public UUID getUserID() {
+        return uuid;
     }
 }

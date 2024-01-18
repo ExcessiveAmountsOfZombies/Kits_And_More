@@ -4,6 +4,7 @@ import com.epherical.octoecon.api.Currency;
 import com.epherical.octoecon.api.transaction.Transaction;
 import com.epherical.octoecon.api.user.User;
 import com.google.common.collect.Maps;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 
@@ -12,14 +13,22 @@ import java.util.Map;
 import static com.epherical.octoecon.api.transaction.Transaction.Response.SUCCESS;
 import static com.epherical.octoecon.api.transaction.Transaction.Type.*;
 
-public abstract class AbstractUser implements User {
-    private final String identifier;
-    protected final Map<Currency, Double> balances;
-    private boolean dirty = false;
+public abstract class EconomyUser implements User {
+    protected final String identifier;
+    protected boolean dirty = false;
+    protected double balance = 0.0D;
 
-    public AbstractUser(String name, Map<Currency, Double> balances) {
+
+    public EconomyUser(String name) {
         this.identifier = name;
-        this.balances = balances;
+    }
+
+
+    public CompoundTag save() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("name", identifier);
+        tag.putDouble("balance", balance);
+        return tag;
     }
 
     @Override
@@ -29,15 +38,12 @@ public abstract class AbstractUser implements User {
 
     @Override
     public double getBalance(Currency currency) {
-        if (currency.balanceProvider() != null) {
-            return currency.balanceProvider().getBalance(this);
-        }
-        return balances.get(currency);
+        return balance;
     }
 
     @Override
     public Map<Currency, Double> getAllBalances() {
-        return balances;
+        return Maps.newHashMap();
     }
 
     @Override
@@ -50,25 +56,21 @@ public abstract class AbstractUser implements User {
         if (currency.balanceProvider() != null) {
             return currency.balanceProvider().setBalance(this, 0, currency);
         }
-        Double currentValue = balances.get(currency);
-        balances.put(currency, 0.0D);
+        double currentValue = balance;
+        balance = 0;
         dirty = true;
         return new BasicTransaction(currentValue, currency, this, "Reset balance of User", SUCCESS, currentValue <= 0 ? DEPOSIT : WITHDRAW);
     }
 
     @Override
     public Map<Currency, Transaction> resetAllBalances() {
-        Map<Currency, Transaction> balanceResetResult = Maps.newHashMap();
-        for (Currency currency : balances.keySet()) {
-            balanceResetResult.put(currency, resetBalance(currency));
-        }
         dirty = true;
-        return balanceResetResult;
+        return Maps.newHashMap();
     }
 
     @Override
     public Transaction setBalance(Currency currency, double amount) {
-        balances.put(currency, amount);
+        balance = amount;
         dirty = true;
         return new BasicTransaction(amount, currency, this, "Set balance of user", SUCCESS, SET);
     }
@@ -76,9 +78,6 @@ public abstract class AbstractUser implements User {
     @Override
     public Transaction sendTo(User user, Currency currency, double amount) {
         Validate.isTrue(amount >= 0, "Values are required to be positive, %.2f was given.", amount);
-        if (currency.balanceProvider() != null) {
-            return currency.balanceProvider().sendTo(this, user, amount, currency);
-        }
         Transaction transaction = withdrawMoney(currency, amount, "Sending money from " + this.getIdentity() + " to " + user.getIdentity() + ".");
         user.depositMoney(currency, amount, user.getIdentity() + " received money from " + this.getIdentity() + ".");
         dirty = true;
@@ -88,9 +87,6 @@ public abstract class AbstractUser implements User {
     @Override
     public Transaction depositMoney(Currency currency, double amount, String reason) {
         Validate.isTrue(amount >= 0, "Values are required to be positive, %.2f was given.", amount);
-        if (currency.balanceProvider() != null) {
-            return currency.balanceProvider().deposit(this, amount, reason, currency);
-        }
         Transaction transaction = new BasicTransaction(amount, currency, this, reason, SUCCESS, DEPOSIT);
         this.addTransaction(transaction);
         dirty = true;
@@ -100,9 +96,6 @@ public abstract class AbstractUser implements User {
     @Override
     public Transaction withdrawMoney(Currency currency, double amount, String reason) {
         Validate.isTrue(amount >= 0, "Values are required to be positive, %.2f was given.", amount);
-        if (currency.balanceProvider() != null) {
-            return currency.balanceProvider().withdraw(this, amount, reason, currency);
-        }
         Transaction transaction = new BasicTransaction(amount, currency, this, reason, SUCCESS, WITHDRAW);
         this.addTransaction(transaction);
         dirty = true;
@@ -115,12 +108,11 @@ public abstract class AbstractUser implements User {
     }
 
     public void addTransaction(Transaction transaction) {
-        balances.put(transaction.getCurrency(), transactionBalance(transaction));
+        balance = transactionBalance(transaction);
     }
 
     public double transactionBalance(Transaction transaction) {
-        balances.putIfAbsent(transaction.getCurrency(), 0.0D);
-        double sum = balances.get(transaction.getCurrency());
+        double sum = balance;
         if (transaction.getTransactionType().equals(DEPOSIT)) {
             sum += transaction.getTransactionDelta();
         } else if (transaction.getTransactionType().equals(WITHDRAW)) {
@@ -144,7 +136,7 @@ public abstract class AbstractUser implements User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AbstractUser that = (AbstractUser) o;
+        EconomyUser that = (EconomyUser) o;
 
         return identifier.equals(that.identifier);
     }

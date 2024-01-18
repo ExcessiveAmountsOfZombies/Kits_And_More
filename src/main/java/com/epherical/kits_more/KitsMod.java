@@ -1,7 +1,7 @@
 package com.epherical.kits_more;
 
 import com.epherical.epherolib.libs.org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import com.epherical.kits_more.config.KitConfig;
+import com.epherical.kits_more.config.Config;
 import com.epherical.kits_more.config.Translations;
 import com.epherical.kits_more.data.KitData;
 import com.epherical.kits_more.data.UserData;
@@ -17,10 +17,15 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class KitsMod {
 
     protected static final Logger LOGGER = LogUtils.getLogger();
+
+    protected ScheduledExecutorService saveSchedule = Executors.newSingleThreadScheduledExecutor();
 
 
     public static final List<Permission> PERMISSIONS = new ArrayList<>();
@@ -41,16 +46,19 @@ public class KitsMod {
 
     public UserData userData;
     public KitData kitData = new KitData();
-    public KitConfig config;
+    public Config config;
+    public EconomyProvider provider;
 
     public Translations translations;
 
     public KitsMod() {
-        config = new KitConfig(HoconConfigurationLoader.builder(), "kits_and_more.conf");
+        config = new Config(HoconConfigurationLoader.builder(), "kits_and_more.conf");
         config.loadConfig("kits_and_more");
 
         translations = new Translations("translations");
         translations.loadTranslations("kits_and_more", "en_us");
+
+
     }
 
 
@@ -71,17 +79,29 @@ public class KitsMod {
     public void onServerStarting(MinecraftServer server) {
         this.userData = new UserData(LevelResource.ROOT, server, "kits_and_more/players");
         this.kitData.loadKitsFromFile();
+
+        if (config.useSaveThread) {
+            saveSchedule.scheduleAtFixedRate(userData::savePlayers, 2L, 1L, TimeUnit.MINUTES);
+        }
+    }
+
+    public void onServerStopping(MinecraftServer server) {
+        if (config.useSaveThread) {
+            saveSchedule.shutdown();
+        }
     }
 
 
     public void onPlayerJoin(ServerPlayer player) {
         int value = player.getStats().getValue((Stats.CUSTOM), Stats.PLAYER_KILLS);
-        User user = userData.getUser(player);
-        if (value > 0 && config.giveKitsInExistingWorlds && !user.hasReceivedMainKit()) {
+        User user = userData.userJoin(player);
+        if (value > 0 && config.giveKitsInExistingWorlds && !user.hasReceivedFirstLoginBenefits()) {
             provideKit(player, user, false);
-        } else if (value <= 0 && !user.hasReceivedMainKit()) {
+            user.setBalance(provider.getDefaultCurrency(), config.moneyGivenOnFirstLogin);
+        } else if (value <= 0 && !user.hasReceivedFirstLoginBenefits()) {
             // This happens on first login
             provideKit(player, user, true);
+            user.setBalance(provider.getDefaultCurrency(), config.moneyGivenOnFirstLogin);
         }
 
         userData.savePlayer(user);
@@ -91,14 +111,14 @@ public class KitsMod {
         Kit main = kitData.KITS.get("main");
         if (main != null) {
             main.giveKitToPlayer(player, firstLogin);
-            user.setReceivedMainKit(true);
+            user.setReceivedFirstLoginBenefits(true);
         } else {
             LOGGER.debug("Could not provide a kit to player {} {} as it does not exist", player.getUUID(), player.getScoreboardName());
         }
     }
 
     public void onPlayerQuit(ServerPlayer player) {
-        userData.savePlayer(userData.getUser(player));
+        userData.userQuit(player);
     }
 
 

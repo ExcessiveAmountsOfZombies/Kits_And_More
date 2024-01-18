@@ -68,9 +68,9 @@ public class EconomyCommands {
     }
 
     protected static int checkBalance(CommandContext<CommandSourceStack> context, ServerPlayer player) {
-        UniqueUser user = provider.getOrCreatePlayerAccount(player.getUUID());
+        UniqueUser user = instance.provider.getOrCreatePlayerAccount(player.getUUID());
         if (user != null) {
-            Currency currency = provider.getDefaultCurrency();
+            Currency currency = instance.provider.getDefaultCurrency();
             double balance = user.getBalance(currency);
             Component text = currency.format(balance, 2);
             Component playerName = Component.literal(player.getScoreboardName()).setStyle(Constants.VARIABLE_STYLE);
@@ -85,9 +85,9 @@ public class EconomyCommands {
     protected static int addMoney(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = EntityArgument.getPlayer(context, "player");
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        UniqueUser user = provider.getOrCreatePlayerAccount(player.getUUID());
+        UniqueUser user = instance.provider.getOrCreatePlayerAccount(player.getUUID());
         if (user != null) {
-            Currency currency = provider.getDefaultCurrency();
+            Currency currency = instance.provider.getDefaultCurrency();
             user.depositMoney(currency, amount, "command");
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
             Component component = instance.translations.createTranslation(player, "econ.player.added", currency.format(amount, 2), playerName)
@@ -101,9 +101,9 @@ public class EconomyCommands {
     protected static int removeMoney(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = EntityArgument.getPlayer(context, "player");
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        UniqueUser user = provider.getOrCreatePlayerAccount(player.getUUID());
+        UniqueUser user = instance.provider.getOrCreatePlayerAccount(player.getUUID());
         if (user != null) {
-            Currency currency = provider.getDefaultCurrency();
+            Currency currency = instance.provider.getDefaultCurrency();
             user.withdrawMoney(currency, amount, "command");
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
             Component component = instance.translations.createTranslation(player, "econ.player.removed", currency.format(amount, 2), playerName)
@@ -117,9 +117,9 @@ public class EconomyCommands {
     protected static int setMoney(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = EntityArgument.getPlayer(context, "player");
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        UniqueUser user = provider.getOrCreatePlayerAccount(player.getUUID());
+        UniqueUser user = instance.provider.getOrCreatePlayerAccount(player.getUUID());
         if (user != null) {
-            Currency currency = provider.getDefaultCurrency();
+            Currency currency = instance.provider.getDefaultCurrency();
             user.setBalance(currency, amount);
             Component playerName = pluralize(player.getScoreboardName(), Constants.VARIABLE_STYLE);
             Component component = instance.translations.createTranslation(player, "econ.player.set", currency.format(amount, 2), playerName)
@@ -134,8 +134,8 @@ public class EconomyCommands {
         ServerPlayer source = context.getSource().getPlayerOrException();
         ServerPlayer target = EntityArgument.getPlayer(context, "player");
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        UniqueUser sourceUser = provider.getOrCreatePlayerAccount(source.getUUID());
-        UniqueUser targetUser = provider.getOrCreatePlayerAccount(target.getUUID());
+        UniqueUser sourceUser = instance.provider.getOrCreatePlayerAccount(source.getUUID());
+        UniqueUser targetUser = instance.provider.getOrCreatePlayerAccount(target.getUUID());
         if (sourceUser != null && targetUser != null) {
             if (source.equals(target)) {
                 Component message = instance.translations.createTranslation(source, "econ.player.error.send_money_to_self").setStyle(Constants.ERROR_STYLE);
@@ -143,7 +143,7 @@ public class EconomyCommands {
                 return 0;
             }
 
-            Currency currency = provider.getDefaultCurrency();
+            Currency currency = instance.provider.getDefaultCurrency();
             if (sourceUser.hasAmount(currency, amount)) {
                 sourceUser.sendTo(targetUser, currency, amount);
                 Component targetName = Component.literal(target.getScoreboardName()).withStyle(Constants.VARIABLE_STYLE);
