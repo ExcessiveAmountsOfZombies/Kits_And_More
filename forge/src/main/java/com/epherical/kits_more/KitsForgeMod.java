@@ -33,9 +33,9 @@ public class KitsForgeMod extends KitsMod {
 
 
     public KitsForgeMod() {
-        super();
         mod = this;
         CommonPlatform.create(new ForgePlatform());
+        init();
         try {
             Files.createDirectories(CommonPlatform.platform.getRootConfigPath("kits_and_more"));
         } catch (IOException e) {

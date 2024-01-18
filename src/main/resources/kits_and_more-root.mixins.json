@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.epherical.kits_more.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "kits_and_more.refmap.json",
+  "refmap": "kits_and_more-refmap.json",
   "mixins": [
     "InventoryAccessor"
   ],

@@ -20,6 +20,7 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
     @Override
     public void onInitialize() {
         CommonPlatform.create(new FabricPlatform());
+        init();
         try {
             Files.createDirectories(CommonPlatform.platform.getRootConfigPath("kits_and_more"));
         } catch (IOException e) {

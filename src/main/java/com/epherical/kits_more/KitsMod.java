@@ -51,14 +51,17 @@ public class KitsMod {
 
     public Translations translations;
 
-    public KitsMod() {
+    public KitsMod() {}
+
+    public void init() {
         config = new Config(HoconConfigurationLoader.builder(), "kits_and_more.conf");
         config.loadConfig("kits_and_more");
 
+
+        provider = new EconomyProvider(this, new ArrayList<>());
+
         translations = new Translations("translations");
         translations.loadTranslations("kits_and_more", "en_us");
-
-
     }
 
 

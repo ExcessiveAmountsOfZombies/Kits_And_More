@@ -59,7 +59,9 @@ public class UserData extends WorldBasedStorage {
         } catch (IOException ignored) {
             LOGGER.debug("Creating new User for {}, {} as they do not exist currently.", player.getScoreboardName(), player.getUUID());
         }
-        return new User(player.getUUID(), player.getScoreboardName(), player);
+        User user = new User(player.getUUID(), player.getScoreboardName(), player);
+        LOADED_USERS.put(player.getUUID(), user);
+        return user;
     }
 
     public void savePlayers() {

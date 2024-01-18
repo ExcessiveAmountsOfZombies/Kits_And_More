@@ -27,7 +27,7 @@ public class EconomyProvider implements Economy {
     private final ResourceLocation currencyName = new ResourceLocation("eights_economy", "dollars");
 
 
-    public EconomyProvider(KitsMod mod, Path access, List<Currency> currencyList) {
+    public EconomyProvider(KitsMod mod, List<Currency> currencyList) {
         this.mod = mod;
         currencyMap.put(currencyName, new BasicCurrency(currencyName));
         for (Currency currency : currencyList) {
