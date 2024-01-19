@@ -23,6 +23,9 @@ public abstract class EconomyUser implements User {
         this.identifier = name;
     }
 
+    public void load(CompoundTag tag) {
+        balance = tag.getDouble("balance");
+    }
 
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();

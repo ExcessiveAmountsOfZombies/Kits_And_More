@@ -81,6 +81,7 @@ public class KitsMod {
 
     public void onServerStarting(MinecraftServer server) {
         this.userData = new UserData(LevelResource.ROOT, server, "kits_and_more/players");
+        this.userData.load();
         this.kitData.loadKitsFromFile();
 
         if (config.useSaveThread) {

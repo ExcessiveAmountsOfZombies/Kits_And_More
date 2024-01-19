@@ -34,6 +34,20 @@ public class User extends EconomyUser implements UniqueUser {
         this.player = player;
     }
 
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        receivedFirstLoginBenefits = tag.getBoolean("receivedFirstLoginBenefits");
+        Map<String, Instant> coolDowns = new HashMap<>();
+        ListTag listTag = (ListTag) tag.get("cooldowns");
+        if (listTag != null) {
+            for (Tag t : listTag) {
+                CompoundTag comp = (CompoundTag) t;
+                coolDowns.put(comp.getString("kitName"), Instant.ofEpochSecond(comp.getLong("cooldown")));
+            }
+        }
+        kitCoolDowns = coolDowns;
+    }
+
 
     public CompoundTag save() {
         CompoundTag tag = super.save();
@@ -51,16 +65,8 @@ public class User extends EconomyUser implements UniqueUser {
 
     public static User load(CompoundTag tag, ServerPlayer player) {
         User user = new User(tag.getUUID("uuid"), tag.getString("name"), player);
-        user.receivedFirstLoginBenefits = tag.getBoolean("receivedFirstLoginBenefits");
-        Map<String, Instant> coolDowns = new HashMap<>();
-        ListTag listTag = (ListTag) tag.get("cooldowns");
-        if (listTag != null) {
-            for (Tag t : listTag) {
-                CompoundTag comp = (CompoundTag) t;
-                coolDowns.put(comp.getString("kitName"), Instant.ofEpochSecond(comp.getLong("cooldown")));
-            }
-        }
-        user.kitCoolDowns = coolDowns;
+        user.load(tag);
+
         return user;
     }
 

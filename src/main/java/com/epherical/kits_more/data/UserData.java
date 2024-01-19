@@ -1,7 +1,6 @@
 package com.epherical.kits_more.data;
 
 import com.epherical.epherolib.data.WorldBasedStorage;
-import com.epherical.kits_more.exception.EconomyException;
 import com.epherical.kits_more.util.User;
 import com.epherical.octoecon.api.user.UniqueUser;
 import com.google.gson.Gson;
@@ -15,14 +14,17 @@ import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class UserData extends WorldBasedStorage {
 
-    private final Map<UUID, UniqueUser> LOADED_USERS = new HashMap<>();
+    private final Map<UUID, UniqueUser> UUID_LOADED_USERS = new HashMap<>();
+    private final Map<String, UniqueUser> NAME_LOADED_USERS = new HashMap<>();
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -48,25 +50,45 @@ public class UserData extends WorldBasedStorage {
         }
     }
 
+    public void load() {
+        try (Stream<Path> stream =  Files.walk(basePath)) {
+            stream.filter(Files::isRegularFile)
+                            .forEach(path -> {
+                                try {
+                                    Tag tag = readTagFromFile(path);
+                                    User load = User.load((CompoundTag) tag, null);
+                                    UUID_LOADED_USERS.put(load.getUserID(), load);
+                                    NAME_LOADED_USERS.put(load.getName().toLowerCase(), load);
+                                } catch (IOException e) {
+                                    LOGGER.warn("Could not read user", e);
+                                }
+                            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public User load(ServerPlayer player) {
         Path path = resolve(player.getUUID());
         Tag tag;
         try {
             tag = readTagFromFile(path);
             User load = User.load((CompoundTag) tag, player);
-            LOADED_USERS.put(player.getUUID(), load);
+            UUID_LOADED_USERS.put(player.getUUID(), load);
+            NAME_LOADED_USERS.put(player.getScoreboardName().toLowerCase(), load);
             return load;
         } catch (IOException ignored) {
             LOGGER.debug("Creating new User for {}, {} as they do not exist currently.", player.getScoreboardName(), player.getUUID());
         }
         User user = new User(player.getUUID(), player.getScoreboardName(), player);
-        LOADED_USERS.put(player.getUUID(), user);
+        UUID_LOADED_USERS.put(player.getUUID(), user);
+        NAME_LOADED_USERS.put(player.getScoreboardName().toLowerCase(), user);
         return user;
     }
 
     public void savePlayers() {
-        synchronized (LOADED_USERS) {
-            for (UniqueUser value : LOADED_USERS.values()) {
+        synchronized (UUID_LOADED_USERS) {
+            for (UniqueUser value : UUID_LOADED_USERS.values()) {
                 User user = (User) value;
                 savePlayer(user);
             }
@@ -74,16 +96,16 @@ public class UserData extends WorldBasedStorage {
     }
 
     public User getUser(ServerPlayer player) {
-        if (LOADED_USERS.containsKey(player.getUUID())) {
-            return (User) LOADED_USERS.get(player.getUUID());
+        if (UUID_LOADED_USERS.containsKey(player.getUUID())) {
+            return (User) UUID_LOADED_USERS.get(player.getUUID());
         } else {
             return load(player);
         }
     }
 
     public User getUser(UUID uuid) {
-        if (LOADED_USERS.containsKey(uuid)) {
-            return (User) LOADED_USERS.get(uuid);
+        if (UUID_LOADED_USERS.containsKey(uuid)) {
+            return (User) UUID_LOADED_USERS.get(uuid);
         } else {
             return null;
         }
@@ -103,10 +125,14 @@ public class UserData extends WorldBasedStorage {
     }
 
     public boolean userExists(UUID uuid) {
-        return LOADED_USERS.containsKey(uuid);
+        return UUID_LOADED_USERS.containsKey(uuid);
     }
 
     public Map<UUID, UniqueUser> getUsers() {
-        return LOADED_USERS;
+        return UUID_LOADED_USERS;
+    }
+
+    public User getUserByName(String name) {
+        return (User) NAME_LOADED_USERS.get(name);
     }
 }

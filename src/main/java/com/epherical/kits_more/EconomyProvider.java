@@ -97,7 +97,7 @@ public class EconomyProvider implements Economy {
 
     @Override
     public @Nullable UniqueUser getPlayerAccountByName(String s) {
-        return null;
+        return mod.userData.getUserByName(s.toLowerCase());
     }
 
     @Override
