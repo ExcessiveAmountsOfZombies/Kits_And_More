@@ -44,6 +44,8 @@ public class KitsMod {
     public final Permission SET = registerPermission(new Permission(Constants.id("command.balance.set"), (stack, player) -> getDefaultPerms(stack, player, 2)));
     public final Permission PAY = registerPermission(new Permission(Constants.id("command.balance.pay"), (stack, player) -> getDefaultPerms(stack, player, 0)));
 
+    public final Permission BALTOP = registerPermission(new Permission(Constants.id("command.baltop.check"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+
     public UserData userData;
     public KitData kitData = new KitData();
     public Config config;
@@ -93,6 +95,7 @@ public class KitsMod {
         if (config.useSaveThread) {
             saveSchedule.shutdown();
         }
+        userData.savePlayers();
     }
 
 

@@ -4,6 +4,7 @@ import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.FabricPlatform;
 import com.epherical.kits_more.commands.EconomyCommands;
 import com.epherical.kits_more.commands.KitCommand;
+import com.epherical.octoecon.api.event.EconomyEvents;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -29,7 +30,8 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             KitCommand.register(this, dispatcher, registryAccess, environment);
-            EconomyCommands.register(this, dispatcher, registryAccess, environment);
+            if (config.enableEcon)
+                EconomyCommands.register(this, dispatcher, registryAccess, environment);
         });
         for (Permission permission : PERMISSIONS) {
             permission.setPlatformResolver((stack, player) -> {
@@ -48,7 +50,10 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
             onPlayerQuit(handler.player);
         });
 
-        ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            onServerStarting(server);
+            EconomyEvents.ECONOMY_CHANGE_EVENT.invoker().onEconomyChanged(provider);
+        });
         ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
     }
 }

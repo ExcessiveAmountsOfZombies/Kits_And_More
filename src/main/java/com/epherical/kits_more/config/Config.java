@@ -17,8 +17,13 @@ public class Config extends CommonConfig {
     public boolean useSaveThread = false;
     public double moneyGivenOnFirstLogin = 0D;
 
+
+    // Enable/Disable for modules
+    public boolean enableEcon = true;
+
     public Config(AbstractConfigurationLoader.Builder<?, ?> loaderBuilder, String configName) {
         super(loaderBuilder, configName);
+        configVersion = 2;
     }
 
     @Override
@@ -27,6 +32,8 @@ public class Config extends CommonConfig {
        giveKitsInExistingWorlds = node.node("giveKitsInExistingWorlds").getBoolean(giveKitsInExistingWorlds);
        useSaveThread = node.node("useSaveThread").getBoolean(useSaveThread);
        moneyGivenOnFirstLogin = node.node("moneyGivenOnFirstLogin").getDouble(moneyGivenOnFirstLogin);
+
+       enableEcon = node.node("modules").node("economy").getBoolean(enableEcon);
 
 
     }
@@ -41,6 +48,9 @@ public class Config extends CommonConfig {
                     .comment("This will create a separate thread for when the user is being saved to a file");
             node.node("moneyGivenOnFirstLogin").set(moneyGivenOnFirstLogin)
                     .comment("When the player has their player file first created, they will be given a set amount of money.");
+
+
+            node.node("modules").node("economy").set(enableEcon).comment("Default true, adds an economy system to the server, set to false to disable the functionality");
 
         } catch (SerializationException e) {
             LOGGER.warn("Could not serialize value to config!", e);

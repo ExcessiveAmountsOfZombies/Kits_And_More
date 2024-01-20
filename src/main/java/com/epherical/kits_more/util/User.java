@@ -1,7 +1,6 @@
 package com.epherical.kits_more.util;
 
 import com.epherical.kits_more.util.econ.EconomyUser;
-import com.epherical.octoecon.api.Currency;
 import com.epherical.octoecon.api.user.UniqueUser;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

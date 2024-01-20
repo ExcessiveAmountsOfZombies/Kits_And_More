@@ -4,6 +4,7 @@ import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.ForgePlatform;
 import com.epherical.kits_more.commands.EconomyCommands;
 import com.epherical.kits_more.commands.KitCommand;
+import com.epherical.octoecon.api.event.EconomyChangeEvent;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -60,7 +61,9 @@ public class KitsForgeMod extends KitsMod {
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
         KitCommand.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
-        EconomyCommands.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        if (config.enableEcon) {
+            EconomyCommands.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        }
     }
 
 
@@ -77,6 +80,7 @@ public class KitsForgeMod extends KitsMod {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         onServerStarting(event.getServer());
+        MinecraftForge.EVENT_BUS.post(new EconomyChangeEvent(provider));
     }
 
     @SubscribeEvent

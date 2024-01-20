@@ -24,6 +24,10 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class EconomyCommands {
@@ -35,6 +39,11 @@ public class EconomyCommands {
 
     public static void register(KitsMod mod, CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
         instance = mod;
+        dispatcher.register(Commands.literal("baltop")
+                .requires(stack -> require(stack, mod.BALTOP))
+                .executes(EconomyCommands::runBaltop)
+                .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                        .executes(EconomyCommands::runBaltop)));
         LiteralCommandNode<CommandSourceStack> mainCommand = dispatcher.register(Commands.literal("bal")
                 .requires(stack -> require(stack, mod.CHECK))
                 .executes(context -> checkBalance(context, context.getSource().getTextName()))
@@ -169,9 +178,54 @@ public class EconomyCommands {
                             .setStyle(Constants.APPROVAL_STYLE);
                     targetPlayer.sendSystemMessage(targetMessage);
                 }
+                instance.userData.savePlayer((User) targetUser);
 
             }
         }
+        return 1;
+    }
+
+    private static int runBaltop(CommandContext<CommandSourceStack> stack) {
+        int page = 1;
+        try {
+            page = IntegerArgumentType.getInteger(stack, "page");
+        } catch (IllegalArgumentException ignored) {
+        }
+        List<UniqueUser> users = new ArrayList<>(instance.userData.getUsers().values());
+        Comparator<UniqueUser> userComparator = Comparator.comparingDouble(value -> value.getBalance(instance.provider.getDefaultCurrency()));
+        users.sort(userComparator.reversed());
+        page = Math.max(page, 1);
+        int maxPage = Math.max(users.size() / 10, 1);
+        maxPage = users.size() % 10 != 0 ? maxPage + 1 : maxPage;
+        int counter = page == 1 ? 1 : ((page - 1) * 10) + 1;
+
+        int begin = page == 1 ? 0 : Math.min(users.size(), ((page - 1) * 10));
+        int end = page == 1 ? Math.min(users.size(), 10) : Math.min(users.size(), (page * 10));
+
+
+        List<UniqueUser> sublist = users.subList(begin, end);
+        if (sublist.isEmpty()) {
+            stack.getSource().sendSuccess(() -> Component.translatable("No Entries"), false);
+        } else {
+            Component component = Component.literal("-=- ").setStyle(Constants.CONSTANTS_STYLE)
+                    .append(Component.literal("Page ").setStyle(Constants.CONSTANTS_STYLE))
+                    .append(Component.literal("" + page).setStyle(Constants.VARIABLE_STYLE))
+                    .append(Component.literal("/").setStyle(Constants.CONSTANTS_STYLE))
+                    .append(Component.literal("" + maxPage).setStyle(Constants.VARIABLE_STYLE))
+                    .append(Component.literal(" -=- Top Balances -=-=-").setStyle(Constants.CONSTANTS_STYLE));
+            stack.getSource().sendSuccess(() -> component, false);
+            for (UniqueUser user : users.subList(begin, end)) {
+                Component money = instance.provider.getDefaultCurrency().format(user.getBalance(instance.provider.getDefaultCurrency()));
+                Component row = Component.literal(counter + ". ").setStyle(Constants.VARIABLE_STYLE)
+                        .append(user.getDisplayName())
+                        .append(" ")
+                        .append(money);
+                stack.getSource().sendSuccess(() ->  row, false);
+                counter++;
+            }
+        }
+
+
         return 1;
     }
 
