@@ -2,6 +2,7 @@ package com.epherical.kits_more;
 
 import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.FabricPlatform;
+import com.epherical.kits_more.commands.BankCommands;
 import com.epherical.kits_more.commands.EconomyCommands;
 import com.epherical.kits_more.commands.KitCommand;
 import com.epherical.octoecon.api.event.EconomyEvents;
@@ -32,6 +33,8 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
             KitCommand.register(this, dispatcher, registryAccess, environment);
             if (config.enableEcon)
                 EconomyCommands.register(this, dispatcher, registryAccess, environment);
+            if (config.enableBank)
+                BankCommands.register(this, dispatcher, registryAccess, environment);
 
         });
         for (Permission permission : PERMISSIONS) {

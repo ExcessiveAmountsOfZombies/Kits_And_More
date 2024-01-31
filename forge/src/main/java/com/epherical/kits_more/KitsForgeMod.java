@@ -2,6 +2,7 @@ package com.epherical.kits_more;
 
 import com.epherical.epherolib.CommonPlatform;
 import com.epherical.epherolib.ForgePlatform;
+import com.epherical.kits_more.commands.BankCommands;
 import com.epherical.kits_more.commands.EconomyCommands;
 import com.epherical.kits_more.commands.KitCommand;
 import com.epherical.octoecon.api.event.EconomyChangeEvent;
@@ -61,9 +62,10 @@ public class KitsForgeMod extends KitsMod {
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
         KitCommand.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
-        if (config.enableEcon) {
+        if (config.enableEcon)
             EconomyCommands.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
-        }
+        if (config.enableBank)
+            BankCommands.register(this, event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
     }
 
 
