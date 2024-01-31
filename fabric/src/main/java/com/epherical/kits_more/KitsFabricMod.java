@@ -32,6 +32,7 @@ public class KitsFabricMod extends KitsMod implements ModInitializer {
             KitCommand.register(this, dispatcher, registryAccess, environment);
             if (config.enableEcon)
                 EconomyCommands.register(this, dispatcher, registryAccess, environment);
+
         });
         for (Permission permission : PERMISSIONS) {
             permission.setPlatformResolver((stack, player) -> {

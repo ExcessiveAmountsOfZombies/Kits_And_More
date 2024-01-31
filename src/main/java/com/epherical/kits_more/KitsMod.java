@@ -46,6 +46,16 @@ public class KitsMod {
 
     public final Permission BALTOP = registerPermission(new Permission(Constants.id("command.baltop.check"), (stack, player) -> getDefaultPerms(stack, player, 0)));
 
+    public final Permission CREATE_BANK = registerPermission(new Permission(Constants.id("command.bank.create"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission BALANCE_BANK = registerPermission(new Permission(Constants.id("command.bank.balance.check"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission INVITE_BANK = registerPermission(new Permission(Constants.id("command.bank.invite"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission REMOVE_PLAYER_BANK = registerPermission(new Permission(Constants.id("command.bank.remove.player"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission DEPOSIT_PLAYER_BANK = registerPermission(new Permission(Constants.id("command.bank.deposit.player"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission WITHDRAW_PLAYER_BANK = registerPermission(new Permission(Constants.id("command.bank.withdraw.player"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+    public final Permission SET_RANK_PLAYER_BANK = registerPermission(new Permission(Constants.id("command.bank.set.rank.player"), (stack, player) -> getDefaultPerms(stack, player, 0)));
+
+
+
     public UserData userData;
     public KitData kitData = new KitData();
     public Config config;

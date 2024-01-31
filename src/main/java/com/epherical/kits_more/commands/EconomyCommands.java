@@ -82,12 +82,6 @@ public class EconomyCommands {
     private static boolean require(CommandSourceStack stack, Permission node) {
         return node.getPlatformResolver().resolve(stack, stack.getPlayer());
     }
-    // todo; add baltop command
-    // todo; add ability to search balances of offline players
-
-    // todo; we need to load all players when the server starts.
-    // todo; release build
-
     protected static int checkBalance(CommandContext<CommandSourceStack> context, String player) {
         User user = (User) instance.provider.getPlayerAccountByName(player);
         if (user != null) {

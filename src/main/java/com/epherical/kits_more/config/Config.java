@@ -20,10 +20,11 @@ public class Config extends CommonConfig {
 
     // Enable/Disable for modules
     public boolean enableEcon = true;
+    public boolean enableBank = true;
 
     public Config(AbstractConfigurationLoader.Builder<?, ?> loaderBuilder, String configName) {
         super(loaderBuilder, configName);
-        configVersion = 2;
+        configVersion = 3;
     }
 
     @Override
@@ -34,6 +35,7 @@ public class Config extends CommonConfig {
        moneyGivenOnFirstLogin = node.node("moneyGivenOnFirstLogin").getDouble(moneyGivenOnFirstLogin);
 
        enableEcon = node.node("modules").node("economy").getBoolean(enableEcon);
+       enableBank = node.node("modules").node("banks").getBoolean(enableBank);
 
 
     }
@@ -50,7 +52,10 @@ public class Config extends CommonConfig {
                     .comment("When the player has their player file first created, they will be given a set amount of money.");
 
 
-            node.node("modules").node("economy").set(enableEcon).comment("Default true, adds an economy system to the server, set to false to disable the functionality");
+            node.node("modules").node("economy")
+                    .set(enableEcon).comment("Default true, adds an economy system to the server, set to false to disable the functionality");
+            node.node("modules").node("banks")
+                    .set(enableBank).comment("Default true, adds a bank system to the server, set to false to disable the functionality");
 
         } catch (SerializationException e) {
             LOGGER.warn("Could not serialize value to config!", e);
