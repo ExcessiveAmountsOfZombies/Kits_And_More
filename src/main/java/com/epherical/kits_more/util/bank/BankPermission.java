@@ -1,7 +1,7 @@
 package com.epherical.kits_more.util.bank;
 
 
-public enum BankPermissions {
+public enum BankPermission {
 
     DEPOSIT("bank.permission.deposit"),
     WITHDRAW("bank.permission.withdraw"),
@@ -14,7 +14,7 @@ public enum BankPermissions {
 
     String permissionTranslationKey;
 
-    BankPermissions(String s) {
+    BankPermission(String s) {
         this.permissionTranslationKey = s;
     }
 
